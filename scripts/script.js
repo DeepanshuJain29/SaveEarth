@@ -93,13 +93,13 @@ Gestures.onTap().subscribe(async e => {
         const animDriv = Animation.timeDriver({ durationMilliseconds: 1000, loopCount: 1, mirror: true });
         animDriv.start();
 
-        const animSamp = Animation.samplers.easeInOutElastic(0, 0.4);
+        const animSamp = Animation.samplers.easeInOutElastic(0, 0.2);
         const anim = Animation.animate(animDriv, animSamp);
         placer.transform.scaleX = anim;
         placer.transform.scaleY = anim;
         placer.transform.scaleZ = anim;
 
-        const animSampShadow = Animation.samplers.easeInOutElastic(0, 6);
+        const animSampShadow = Animation.samplers.easeInOutElastic(0, 4);
         const animShadow = Animation.animate(animDriv, animSampShadow);
         shadow.transform.scaleX = animShadow;
         shadow.transform.scaleY = animShadow;
@@ -127,6 +127,36 @@ Gestures.onTap().subscribe(async e => {
             animDrivBanner.reverse();
         });
     }
+});
+
+const overlay = Scene.root.find('overlay');
+overlay.hidden = true;
+const overlayMat = Materials.get('overlay');
+Gestures.onTap(overlay).subscribe(e => {
+    Patches.inputs.setPulse('overlayTapped', Reactive.once());
+
+    const animDriv = Animation.timeDriver({ durationMilliseconds: 1000, loopCount: 1, mirror: true });
+    animDriv.start();
+
+    const animSamp = Animation.samplers.easeInOutQuint(0.4, 0);
+    const anim = Animation.animate(animDriv, animSamp);
+    overlayMat.opacity = anim;
+
+    animDriv.onCompleted().subscribe(() => overlay.hidden = true);
+});
+
+
+Patches.outputs.getPulse('factObjectTapped').then(pulse => {
+    pulse.subscribe(e => {
+        overlay.hidden = false;
+
+        const animDriv = Animation.timeDriver({ durationMilliseconds: 1000, loopCount: 1, mirror: true });
+        animDriv.start();
+
+        const animSamp = Animation.samplers.easeInOutQuint(0, 0.4);
+        const anim = Animation.animate(animDriv, animSamp);
+        overlayMat.opacity = anim;
+    });
 });
 
 
